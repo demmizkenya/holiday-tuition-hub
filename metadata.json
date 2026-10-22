@@ -1,0 +1,6 @@
+{
+  "name": "Holiday Tuition Hub",
+  "description": "Holiday Tuition Hub is a premier online tutoring and academic mentorship platform for Grades 9-14 in Kenya, featuring live lessons, recorded resources, student scheduling, M-Pesa payment verification, and parent progress monitoring.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
