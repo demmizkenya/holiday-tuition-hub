@@ -7,6 +7,7 @@ interface HeaderProps {
   onNavigate: (view: string) => void;
   currentUser: UserAccount | null;
   onOpenAuthModal: (mode: 'login' | 'register') => void;
+  onLogout?: () => void;
   brandName?: string;
   enrollmentState?: string;
 }
@@ -16,6 +17,7 @@ export const Header: React.FC<HeaderProps> = ({
   onNavigate,
   currentUser,
   onOpenAuthModal,
+  onLogout,
   brandName = 'HOLIDAY TUITION HUB',
   enrollmentState = 'Enrollment open'
 }) => {
@@ -23,7 +25,9 @@ export const Header: React.FC<HeaderProps> = ({
 
   const navLinks = [
     { id: 'home', label: 'Home' },
-    { id: 'about', label: 'About' },
+    { id: 'teachers', label: 'Teachers' },
+    { id: 'discussions', label: 'Discussion' },
+    { id: 'gallery', label: 'Gallery' },
     { id: 'grades', label: 'Grades' },
     { id: 'subjects', label: 'Subjects' },
     { id: 'program', label: 'Program' },
@@ -122,6 +126,16 @@ export const Header: React.FC<HeaderProps> = ({
                     Parent Portal
                   </button>
                 )}
+
+                {onLogout && (
+                  <button
+                    onClick={onLogout}
+                    className="px-2.5 py-1.5 text-xs text-slate-500 hover:text-red-600 font-medium transition-colors ml-1"
+                    title="Sign Out"
+                  >
+                    Sign Out
+                  </button>
+                )}
               </div>
             ) : (
               <div className="flex items-center gap-2">
@@ -190,7 +204,7 @@ export const Header: React.FC<HeaderProps> = ({
                     onClick={() => handleNavClick('admin-dashboard')}
                     className="w-full text-left px-3 py-2 bg-slate-900 text-white rounded-md font-bold text-sm"
                   >
-                    Open Admin Panel (Daniel Owino)
+                    Open Admin Dashboard
                   </button>
                 )}
                 {currentUser.role === 'student' && (

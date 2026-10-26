@@ -12,7 +12,13 @@ import {
   Video,
   FileText,
   Award,
-  Users
+  Users,
+  MessageCircle,
+  MessageSquare,
+  GraduationCap,
+  Image as ImageIcon,
+  Sparkles,
+  ArrowRight
 } from 'lucide-react';
 
 interface HomeViewProps {
@@ -36,115 +42,140 @@ export const HomeView: React.FC<HomeViewProps> = ({
   const commencement = settings?.commencementDate || '2026-11-01';
   const endDate = settings?.endDate || '2026-11-22';
   const enrollmentState = settings?.enrollmentState || 'Enrollment open';
+  const heroBgImage = settings?.heroBackgroundImage || '/assets/aistudio/Gemini_Generated_Image_eiuqjeeiuqjeeiuq_b3db601d.jpeg';
 
   return (
     <div className="space-y-20 pb-16">
-      {/* Hero Section */}
-      <section className="relative bg-gradient-to-b from-blue-50/70 via-white to-white pt-12 pb-16 border-b border-slate-100">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
+      {/* Hero Section: 16:9 Landscape Aspect Ratio with subtle background blur & translucent contrast overlay */}
+      <section className="relative w-full aspect-[16/9] min-h-[640px] sm:min-h-[700px] lg:min-h-[750px] overflow-hidden flex items-center border-b border-slate-900 bg-slate-950">
+        {/* Background Image Layer (Preserves proportions, covers hero, subtle blur only applied to background image) */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <img
+            src={heroBgImage}
+            alt="Holiday Tuition Hub Background"
+            className="w-full h-full object-cover object-center filter blur-[2.5px] scale-105 transition-transform duration-700 pointer-events-none select-none"
+          />
+          {/* Subtle translucent overlay for high contrast and razor-sharp text readability */}
+          <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-900/75 to-slate-950/85" />
+        </div>
+
+        {/* Foreground Content: All Text, Buttons, Badges and Cards Remain Sharp and Vivid */}
+        <div className="relative z-10 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-12 items-center">
             <div className="lg:col-span-7 space-y-6">
               {/* Program Status Tag */}
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-100/80 border border-blue-200 text-blue-900 text-xs font-semibold">
-                <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-blue-500/20 backdrop-blur-md border border-blue-400/30 text-blue-200 text-xs font-semibold shadow-xs">
+                <span className="w-2 h-2 rounded-full bg-blue-400 animate-pulse"></span>
                 <span>{enrollmentState} • Holiday Cohort: 1 Nov – 22 Nov 2026</span>
               </div>
 
-              {/* Required Main Headline */}
-              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight font-sans leading-[1.1]">
+              {/* Main Headline */}
+              <h1 className="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-white tracking-tight font-sans leading-[1.1] drop-shadow-sm">
                 Make Your Holiday Count.
               </h1>
 
-              {/* Required Supporting Headline */}
-              <h2 className="text-xl sm:text-2xl font-bold text-blue-800 tracking-tight">
+              {/* Supporting Headline */}
+              <h2 className="text-xl sm:text-2xl font-bold text-blue-300 tracking-tight drop-shadow-xs">
                 Quality Online Tutoring for Grades 9–14.
               </h2>
 
-              {/* Required Supporting Description */}
-              <p className="text-base sm:text-lg text-slate-700 leading-relaxed max-w-2xl">
+              {/* Supporting Description */}
+              <p className="text-base sm:text-lg text-slate-200 leading-relaxed max-w-2xl drop-shadow-xs">
                 Holiday Tuition Hub provides online tutoring in Mathematics, English, Chemistry, Kiswahili, and Computer Studies, with live lessons, recorded learning resources, practice assessments, and flexible lesson scheduling.
               </p>
 
               {/* Key Highlights Badge Bar */}
-              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 text-xs text-slate-700 font-medium">
-                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-slate-200 shadow-xs">
-                  <Clock className="w-4 h-4 text-blue-700 shrink-0" />
+              <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 pt-2 text-xs text-slate-100 font-medium">
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/60 backdrop-blur-md border border-slate-700/60 shadow-xs">
+                  <Clock className="w-4 h-4 text-blue-400 shrink-0" />
                   <span>Africa/Nairobi Time</span>
                 </div>
-                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-slate-200 shadow-xs">
-                  <Shield className="w-4 h-4 text-emerald-700 shrink-0" />
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/60 backdrop-blur-md border border-slate-700/60 shadow-xs">
+                  <Shield className="w-4 h-4 text-emerald-400 shrink-0" />
                   <span>KSh {weeklyPrice} / Week Flat</span>
                 </div>
-                <div className="flex items-center gap-2 p-2.5 rounded-lg bg-white border border-slate-200 shadow-xs col-span-2 sm:col-span-1">
-                  <Users className="w-4 h-4 text-amber-600 shrink-0" />
+                <div className="flex items-center gap-2 p-2.5 rounded-xl bg-slate-900/60 backdrop-blur-md border border-slate-700/60 shadow-xs col-span-2 sm:col-span-1">
+                  <Users className="w-4 h-4 text-amber-400 shrink-0" />
                   <span>Parent Monitoring</span>
                 </div>
               </div>
 
-              {/* Required Primary and Secondary Calls to Action */}
-              <div className="flex flex-wrap items-center gap-4 pt-4">
+              {/* Primary and Secondary Calls to Action + Pulsing WhatsApp Button */}
+              <div className="flex flex-wrap items-center gap-3.5 pt-4">
                 <button
                   onClick={() => onNavigate('enroll')}
-                  className="px-8 py-3.5 bg-blue-700 hover:bg-blue-800 active:scale-95 text-white font-extrabold text-base rounded-xl shadow-md transition-all"
+                  className="px-7 py-3.5 bg-blue-600 hover:bg-blue-500 active:scale-95 text-white font-extrabold text-sm sm:text-base rounded-xl shadow-lg shadow-blue-600/30 transition-all border border-blue-400/30"
                 >
                   Enroll Now
                 </button>
                 <button
                   onClick={() => onNavigate('subjects')}
-                  className="px-7 py-3.5 bg-white hover:bg-slate-50 border border-slate-300 text-slate-800 font-bold text-base rounded-xl shadow-xs transition-all"
+                  className="px-6 py-3.5 bg-white/10 hover:bg-white/20 active:scale-95 border border-white/20 text-white font-bold text-sm sm:text-base rounded-xl backdrop-blur-md shadow-xs transition-all"
                 >
                   Explore Subjects
                 </button>
+
+                {/* Pulsing Join WhatsApp Group Button */}
+                <a
+                  href={settings?.whatsappGroupUrl || 'https://chat.whatsapp.com/invite/HolidayTuitionHubKenya'}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="animate-pulse inline-flex items-center gap-2 px-6 py-3.5 bg-emerald-600 hover:bg-emerald-500 text-white font-extrabold text-sm sm:text-base rounded-xl shadow-lg shadow-emerald-600/30 transition-all border border-emerald-400/40 hover:scale-105"
+                  title="Connect directly with fellow learners on WhatsApp"
+                >
+                  <MessageCircle className="w-5 h-5 text-white shrink-0 fill-current" />
+                  <span>Join WhatsApp group</span>
+                </a>
               </div>
 
-              <div className="text-xs text-slate-500 pt-1">
-                Tutor & Payment Recipient: <strong className="text-slate-800 font-semibold">{tutorName}</strong> • Verified manual M-Pesa Send Money
+              <div className="text-xs text-slate-300 pt-1">
+                Tutor & Payment Recipient: <strong className="text-white font-semibold">{tutorName}</strong> • Verified manual M-Pesa Send Money ({settings?.mpesaNumber || '0116654805'})
               </div>
             </div>
 
             {/* Hero Quick Card - Program At A Glance */}
             <div className="lg:col-span-5">
-              <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xl space-y-6">
-                <div className="border-b border-slate-100 pb-4">
-                  <div className="text-xs font-bold uppercase tracking-wider text-blue-700">
+              <div className="bg-slate-900/85 backdrop-blur-md rounded-2xl p-6 sm:p-8 border border-slate-700/80 shadow-2xl space-y-6 text-white">
+                <div className="border-b border-slate-800 pb-4">
+                  <div className="text-xs font-bold uppercase tracking-wider text-blue-400">
                     November 2026 Intensive
                   </div>
-                  <h3 className="text-xl font-extrabold text-slate-900 mt-1">
+                  <h3 className="text-xl font-extrabold text-white mt-1">
                     Structured Holiday Tuition
                   </h3>
-                  <p className="text-xs text-slate-500 mt-1">
+                  <p className="text-xs text-slate-400 mt-1">
                     Africa/Nairobi Time (UTC+3) • Grades 9 through 14
                   </p>
                 </div>
 
                 <div className="space-y-3.5 text-sm">
-                  <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                    <span className="text-slate-600">Commencement Date</span>
-                    <strong className="text-slate-900 font-semibold">1 November 2026</strong>
+                  <div className="flex justify-between items-center py-2 border-b border-slate-800">
+                    <span className="text-slate-300">Commencement Date</span>
+                    <strong className="text-white font-semibold">1 November 2026</strong>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                    <span className="text-slate-600">Program End Date</span>
-                    <strong className="text-slate-900 font-semibold">22 November 2026</strong>
+                  <div className="flex justify-between items-center py-2 border-b border-slate-800">
+                    <span className="text-slate-300">Program End Date</span>
+                    <strong className="text-white font-semibold">22 November 2026</strong>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                    <span className="text-slate-600">Duration</span>
-                    <strong className="text-slate-900 font-semibold">3 Weeks</strong>
+                  <div className="flex justify-between items-center py-2 border-b border-slate-800">
+                    <span className="text-slate-300">Duration</span>
+                    <strong className="text-white font-semibold">3 Weeks</strong>
                   </div>
-                  <div className="flex justify-between items-center py-2 border-b border-slate-100">
-                    <span className="text-slate-600">Standard Weekly Tuition Fee</span>
-                    <strong className="text-blue-800 font-extrabold text-lg">KSh {weeklyPrice}</strong>
+                  <div className="flex justify-between items-center py-2 border-b border-slate-800">
+                    <span className="text-slate-300">Standard Weekly Tuition Fee</span>
+                    <strong className="text-blue-400 font-extrabold text-lg">KSh {weeklyPrice}</strong>
                   </div>
                   <div className="flex justify-between items-center py-2">
-                    <span className="text-slate-600">Payment Channel</span>
-                    <span className="text-xs font-mono bg-emerald-50 text-emerald-800 px-2.5 py-1 rounded-md font-semibold border border-emerald-200">
-                      M-Pesa 0116654805
+                    <span className="text-slate-300">Payment Channel</span>
+                    <span className="text-xs font-mono bg-emerald-950/80 text-emerald-300 px-2.5 py-1 rounded-md font-semibold border border-emerald-700/60">
+                      M-Pesa {settings?.mpesaNumber || '0116654805'}
                     </span>
                   </div>
                 </div>
 
-                <div className="bg-slate-50 p-4 rounded-xl border border-slate-200 text-xs text-slate-600 space-y-1.5">
-                  <div className="font-semibold text-slate-800">What is included each week:</div>
-                  <ul className="space-y-1 list-disc list-inside text-slate-600">
+                <div className="bg-slate-950/60 p-4 rounded-xl border border-slate-800 text-xs text-slate-300 space-y-1.5">
+                  <div className="font-semibold text-white">What is included each week:</div>
+                  <ul className="space-y-1 list-disc list-inside text-slate-300">
                     <li>Interactive live lessons with student-selected slots</li>
                     <li>Full on-demand library of recorded lessons</li>
                     <li>Comprehensive downloadable PDF notes & worksheets</li>
@@ -155,11 +186,91 @@ export const HomeView: React.FC<HomeViewProps> = ({
 
                 <button
                   onClick={() => onNavigate('enroll')}
-                  className="w-full py-3 bg-blue-700 hover:bg-blue-800 text-white font-bold rounded-xl text-sm transition-colors shadow-xs"
+                  className="w-full py-3.5 bg-blue-600 hover:bg-blue-500 active:scale-[0.99] text-white font-bold rounded-xl text-sm transition-all shadow-md shadow-blue-600/30"
                 >
                   Start Student Registration →
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* New Hub Features: Discussion, Faculty, Gallery */}
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+          {/* Group Discussion Card */}
+          <div
+            onClick={() => onNavigate('discussions')}
+            className="group relative bg-gradient-to-br from-indigo-900 to-slate-900 text-white rounded-2xl p-6 border border-indigo-700/50 hover:border-indigo-400 cursor-pointer transition-all duration-300 shadow-xl hover:-translate-y-1"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-indigo-500/20 text-indigo-300 rounded-xl border border-indigo-500/30">
+                <MessageSquare className="w-6 h-6" />
+              </div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-indigo-300 bg-indigo-500/20 px-2.5 py-1 rounded-full">
+                Peer Forum
+              </span>
+            </div>
+            <h3 className="text-xl font-bold text-white group-hover:text-indigo-200 transition-colors mb-2">
+              Group Discussion
+            </h3>
+            <p className="text-xs text-slate-300 leading-relaxed mb-4">
+              Collaborative study room where students discuss topics they master best, share step-by-step solutions, and debate questions across Grades 9–14.
+            </p>
+            <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-300 group-hover:text-indigo-100">
+              <span>Enter Discussion Hub</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+
+          {/* Expert Teachers Card */}
+          <div
+            onClick={() => onNavigate('teachers')}
+            className="group relative bg-gradient-to-br from-emerald-900 to-slate-900 text-white rounded-2xl p-6 border border-emerald-700/50 hover:border-emerald-400 cursor-pointer transition-all duration-300 shadow-xl hover:-translate-y-1"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-emerald-500/20 text-emerald-300 rounded-xl border border-emerald-500/30">
+                <GraduationCap className="w-6 h-6" />
+              </div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-emerald-300 bg-emerald-500/20 px-2.5 py-1 rounded-full">
+                Faculty
+              </span>
+            </div>
+            <h3 className="text-xl font-bold text-white group-hover:text-emerald-200 transition-colors mb-2">
+              Meet Our Teachers
+            </h3>
+            <p className="text-xs text-slate-300 leading-relaxed mb-4">
+              Meet lead tutor Daniel Owino and our specialized subject mentors with proven track records in Mathematics, Chemistry, English, and Kiswahili.
+            </p>
+            <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-300 group-hover:text-emerald-100">
+              <span>View Faculty Profiles</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </div>
+
+          {/* Media Gallery Card */}
+          <div
+            onClick={() => onNavigate('gallery')}
+            className="group relative bg-gradient-to-br from-sky-900 to-slate-900 text-white rounded-2xl p-6 border border-sky-700/50 hover:border-sky-400 cursor-pointer transition-all duration-300 shadow-xl hover:-translate-y-1"
+          >
+            <div className="flex items-center justify-between mb-4">
+              <div className="p-3 bg-sky-500/20 text-sky-300 rounded-xl border border-sky-500/30">
+                <ImageIcon className="w-6 h-6" />
+              </div>
+              <span className="text-[11px] font-bold uppercase tracking-wider text-sky-300 bg-sky-500/20 px-2.5 py-1 rounded-full">
+                Moments
+              </span>
+            </div>
+            <h3 className="text-xl font-bold text-white group-hover:text-sky-200 transition-colors mb-2">
+              Photo Gallery
+            </h3>
+            <p className="text-xs text-slate-300 leading-relaxed mb-4">
+              Explore snapshots of our live virtual classes, interactive whiteboard sessions, science laboratory setups, and celebrated student achievements.
+            </p>
+            <div className="flex items-center gap-1.5 text-xs font-bold text-sky-300 group-hover:text-sky-100">
+              <span>Explore Gallery</span>
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </div>
           </div>
         </div>
@@ -180,7 +291,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {subjects.map(subj => (
+          {subjects.length === 0 ? (
+            <div className="col-span-full py-12 text-center bg-white border border-dashed border-slate-300 rounded-2xl p-8 text-slate-500 text-sm">
+              No curriculum subjects have been published by administration yet.
+            </div>
+          ) : (
+            subjects.map(subj => (
             <div
               key={subj.id}
               className="bg-white rounded-2xl p-6 border border-slate-200 shadow-xs hover:border-blue-300 hover:shadow-md transition-all flex flex-col justify-between"
@@ -231,7 +347,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                 </button>
               </div>
             </div>
-          ))}
+          )))}
         </div>
       </section>
 
@@ -251,7 +367,12 @@ export const HomeView: React.FC<HomeViewProps> = ({
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {grades.map(grade => (
+            {grades.length === 0 ? (
+              <div className="col-span-full py-12 text-center bg-white border border-dashed border-slate-300 rounded-xl p-8 text-slate-500 text-sm">
+                No grade levels currently configured.
+              </div>
+            ) : (
+              grades.map(grade => (
               <div
                 key={grade.id}
                 className="bg-white rounded-xl p-5 border border-slate-200 shadow-xs space-y-3"
@@ -282,7 +403,7 @@ export const HomeView: React.FC<HomeViewProps> = ({
                   </ul>
                 </div>
               </div>
-            ))}
+            )))}
           </div>
 
           <div className="mt-8 text-center">

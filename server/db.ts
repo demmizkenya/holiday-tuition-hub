@@ -1,5 +1,19 @@
 import fs from 'fs';
 import path from 'path';
+import crypto from 'crypto';
+
+export function hashPassword(password: string, salt = 'hth_admin_salt_demmiz_2026'): string {
+  return crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+}
+
+export function verifyPassword(password: string, storedHash: string, salt = 'hth_admin_salt_demmiz_2026'): boolean {
+  try {
+    const computed = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+    return crypto.timingSafeEqual(Buffer.from(computed, 'hex'), Buffer.from(storedHash, 'hex'));
+  } catch {
+    return false;
+  }
+}
 
 export interface PlatformSettings {
   brandName: string;
@@ -7,6 +21,7 @@ export interface PlatformSettings {
   tutorEmail: string;
   mpesaNumber: string;
   whatsappNumber: string;
+  whatsappGroupUrl: string;
   weeklyPrice: number;
   allowFourWeek: boolean;
   programName: string;
@@ -16,6 +31,7 @@ export interface PlatformSettings {
   timezone: string;
   tutorBio: string;
   aboutText: string;
+  heroBackgroundImage?: string;
 }
 
 export interface GradeItem {
@@ -42,6 +58,8 @@ export interface UserAccount {
   id: string;
   name: string;
   email: string;
+  password?: string;
+  passwordHash?: string;
   phone: string;
   role: 'student' | 'parent' | 'admin' | 'tutor';
   grade?: string;
@@ -49,7 +67,6 @@ export interface UserAccount {
   relationship?: string;
   accountStatus: 'Registered' | 'Enrolled' | 'Suspended';
   createdAt: string;
-  passwordHash?: string;
 }
 
 export interface ParentStudentLink {
@@ -106,9 +123,9 @@ export interface LessonSlot {
   subject: string;
   grade: string;
   tutorName: string;
-  date: string; // YYYY-MM-DD
-  startTime: string; // HH:MM
-  endTime: string; // HH:MM
+  date: string;
+  startTime: string;
+  endTime: string;
   durationMinutes: number;
   capacity: number;
   bookedCount: number;
@@ -269,10 +286,11 @@ export interface Announcement {
 
 export interface SupportInquiry {
   id: string;
-  userId: string;
+  userId?: string;
   userName: string;
   userEmail: string;
-  userRole: string;
+  userPhone?: string;
+  userRole?: string;
   category: 'Payment Verification' | 'Lesson Scheduling' | 'Learning Resources' | 'Account' | 'General';
   subject: string;
   message: string;
@@ -292,6 +310,49 @@ export interface AuditLog {
   details: string;
   adminName: string;
   timestamp: string;
+}
+
+export interface DiscussionReply {
+  id: string;
+  authorId: string;
+  authorName: string;
+  authorGrade?: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface DiscussionTopic {
+  id: string;
+  title: string;
+  subject: string;
+  grade: string;
+  authorId: string;
+  authorName: string;
+  authorGrade?: string;
+  content: string;
+  createdAt: string;
+  likes: number;
+  replies: DiscussionReply[];
+}
+
+export interface GalleryPhoto {
+  id: string;
+  title: string;
+  description: string;
+  category: string;
+  imageUrl: string;
+  dateAdded: string;
+}
+
+export interface TeacherProfile {
+  id: string;
+  name: string;
+  role: string;
+  subjects: string[];
+  qualification: string;
+  experience: string;
+  bio: string;
+  photoUrl: string;
 }
 
 export interface DatabaseSchema {
@@ -314,12 +375,14 @@ export interface DatabaseSchema {
   announcements: Announcement[];
   supportInquiries: SupportInquiry[];
   auditLogs: AuditLog[];
+  discussions: DiscussionTopic[];
+  gallery: GalleryPhoto[];
+  teachers: TeacherProfile[];
 }
 
 const DB_DIR = path.resolve(process.cwd(), 'data');
 const DB_FILE = path.join(DB_DIR, 'db.json');
 
-// Ensure database directory exists
 if (!fs.existsSync(DB_DIR)) {
   fs.mkdirSync(DB_DIR, { recursive: true });
 }
@@ -332,6 +395,7 @@ function getInitialDatabase(): DatabaseSchema {
       tutorEmail: 'danielowino233@gmail.com',
       mpesaNumber: '0116654805',
       whatsappNumber: '0708083643',
+      whatsappGroupUrl: 'https://chat.whatsapp.com/invite/HolidayTuitionHubKenya',
       weeklyPrice: 699,
       allowFourWeek: false,
       programName: 'November 2026 Holiday Intensive',
@@ -340,7 +404,8 @@ function getInitialDatabase(): DatabaseSchema {
       enrollmentState: 'Enrollment open',
       timezone: 'Africa/Nairobi',
       tutorBio: 'Daniel Owino is the founder and lead educator at Holiday Tuition Hub. Dedicated to academic excellence, he delivers structured holiday tuition and mentorship across high school levels (Grades 9 to 14) with a strong emphasis on core concept mastery, exam techniques, and personal academic confidence.',
-      aboutText: 'Holiday Tuition Hub provides premier online tutoring and academic mentorship for high school students in Grades 9 through 14 across Kenya and East Africa. Our structured holiday program combines interactive live lessons, on-demand recorded learning archives, downloadable revision materials, and targeted practice assessments to ensure students make their holiday count.'
+      aboutText: 'Holiday Tuition Hub provides premier online tutoring and academic mentorship for high school students in Grades 9 through 14 across Kenya and East Africa. Our structured holiday program combines interactive live lessons, on-demand recorded learning archives, downloadable revision materials, and targeted practice assessments to ensure students make their holiday count.',
+      heroBackgroundImage: '/assets/aistudio/Gemini_Generated_Image_eiuqjeeiuqjeeiuq_b3db601d.jpeg'
     },
     grades: [
       {
@@ -497,11 +562,153 @@ function getInitialDatabase(): DatabaseSchema {
         isPublished: true
       }
     ],
+    teachers: [
+      {
+        id: 'tch-daniel',
+        name: 'Daniel Owino',
+        role: 'Founder & Lead Tutor',
+        subjects: ['Mathematics', 'Sciences Mentorship'],
+        qualification: 'B.Ed. Science (Mathematics & Chemistry), Academic Consultant',
+        experience: 'Over 8 years guiding secondary students to distinction in national examinations.',
+        bio: 'Specializing in breaking down complex algebraic formulations, differential calculus, and chemical stoichiometry into intuitive, memorable first principles.',
+        photoUrl: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        id: 'tch-sarah',
+        name: 'Sarah Muthoni',
+        role: 'Senior English & Literature Mentor',
+        subjects: ['English Language', 'Literary Analysis'],
+        qualification: 'B.Ed. Arts (English & Literature)',
+        experience: '6+ years coaching candidate students in essay structuring and set-book criticism.',
+        bio: 'Passionate about elevating students writing style, grammatical precision, and literary deconstruction of core set texts.',
+        photoUrl: 'https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        id: 'tch-dennis',
+        name: 'Dr. Dennis Kiprop',
+        role: 'Senior Chemistry Specialist',
+        subjects: ['Chemistry', 'Laboratory Principles'],
+        qualification: 'M.Sc. Chemistry, Ph.D. Candidate',
+        experience: '7 years tutoring secondary and pre-university chemistry students.',
+        bio: 'Brings experimental clarity to quantitative titration, the mole concept, thermodynamics, and organic reaction pathways.',
+        photoUrl: 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        id: 'tch-amina',
+        name: 'Mwalimu Amina Juma',
+        role: 'Kiswahili Scholar & Linguist',
+        subjects: ['Kiswahili (Sarufi, Fasihi & Insha)'],
+        qualification: 'B.Ed. (Kiswahili & History)',
+        experience: '9 years teaching Kiswahili with outstanding KCSE student performances.',
+        bio: 'Mwelekezi mwenye tajriba katika uchambuzi wa riwaya, tamthilia, mbinu za lugha, sarufi ya ngeli na uandishi bora wa insha.',
+        photoUrl: 'https://images.unsplash.com/photo-1567532939604-b6b5b0db2604?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        id: 'tch-brian',
+        name: 'Eng. Brian Ochieng',
+        role: 'Computer Studies & Software Mentor',
+        subjects: ['Computer Studies', 'Algorithms & Logic'],
+        qualification: 'B.Sc. Computer Science',
+        experience: '5 years developing systems and teaching high school computing syllabuses.',
+        bio: 'Guides learners through binary arithmetic, database entity relationships, flowcharts, and clear pseudocode implementation.',
+        photoUrl: 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&w=600&q=80'
+      }
+    ],
+    gallery: [
+      {
+        id: 'gal-1',
+        title: 'Interactive Live Whiteboard Calculus Derivation',
+        description: 'Tutor Daniel Owino guiding students through differential gradient tangent lines.',
+        category: 'Live Classes',
+        imageUrl: 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=800&q=80',
+        dateAdded: '2026-10-18'
+      },
+      {
+        id: 'gal-2',
+        title: 'Stoichiometry & Chemical Practical Preparation',
+        description: 'Laboratory demonstrations illustrating reacting masses, titration, and molarity calculations.',
+        category: 'Science Drills',
+        imageUrl: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80',
+        dateAdded: '2026-10-19'
+      },
+      {
+        id: 'gal-3',
+        title: 'Collaborative Holiday Revision Group',
+        description: 'Students working through timed past-paper questions in our peer discussion hub.',
+        category: 'Student Study',
+        imageUrl: 'https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800&q=80',
+        dateAdded: '2026-10-20'
+      },
+      {
+        id: 'gal-4',
+        title: 'Computer Studies Algorithm & Database Design',
+        description: 'Trace tables, flowcharts, and pseudocode walkthroughs for Grade 11-12 candidates.',
+        category: 'Computing',
+        imageUrl: 'https://images.unsplash.com/photo-1517694712202-14dd9538aa97?auto=format&fit=crop&w=800&q=80',
+        dateAdded: '2026-10-21'
+      }
+    ],
+    discussions: [
+      {
+        id: 'disc-1',
+        title: 'How do you easily find the equation of a normal to a curve in Calculus?',
+        subject: 'Mathematics',
+        grade: 'Grade 11',
+        authorId: 'usr-student-faith',
+        authorName: 'Faith Wanjiru',
+        authorGrade: 'Grade 11',
+        content: 'Hi everyone! While doing calculus differentiation, I know dy/dx gives the tangent slope m1. To get the normal slope, is it always m2 = -1 / m1? How do you handle cases where m1 = 0?',
+        createdAt: '2026-10-21T14:30:00Z',
+        likes: 4,
+        replies: [
+          {
+            id: 'rep-1',
+            authorId: 'usr-admin-daniel',
+            authorName: 'Daniel Owino (Tutor)',
+            content: 'Great question Faith! Yes, because perpendicular lines satisfy m1 * m2 = -1, the normal gradient is the negative reciprocal. When m1 = 0 (a horizontal tangent at a stationary turning point), the normal line is vertical with equation x = x1.',
+            createdAt: '2026-10-21T15:10:00Z'
+          }
+        ]
+      },
+      {
+        id: 'disc-2',
+        title: 'Memorizing Organic Chemistry IUPAC Naming for Alkanols and Alkanoic Acids',
+        subject: 'Chemistry',
+        grade: 'Grade 11',
+        authorId: 'usr-student-kelvin',
+        authorName: 'Kelvin Mwangi',
+        authorGrade: 'Grade 11',
+        content: 'Does anyone have a good mnemonic for remembering the functional group priority and prefixes from meth- to dec-?',
+        createdAt: '2026-10-22T09:15:00Z',
+        likes: 3,
+        replies: [
+          {
+            id: 'rep-2',
+            authorId: 'usr-student-faith',
+            authorName: 'Faith Wanjiru',
+            authorGrade: 'Grade 11',
+            content: 'I use: "Monkeys Eat Peanut Butter" for Methane, Ethane, Propane, Butane! For alkanols, remember the suffix is -ol (-OH group), and for acids it is -oic acid (-COOH).',
+            createdAt: '2026-10-22T10:00:00Z'
+          }
+        ]
+      }
+    ],
     users: [
+      {
+        id: 'usr-admin-demmiz',
+        name: 'Administrator',
+        email: 'demmizkenya@gmail.com',
+        passwordHash: hashPassword('tuition@hub'),
+        phone: '0708083643',
+        role: 'admin',
+        accountStatus: 'Enrolled',
+        createdAt: '2026-10-22T00:00:00Z'
+      },
       {
         id: 'usr-admin-daniel',
         name: 'Daniel Owino',
         email: 'danielowino233@gmail.com',
+        passwordHash: hashPassword('tuition@hub'),
         phone: '0116654805',
         role: 'admin',
         accountStatus: 'Enrolled',
@@ -511,6 +718,7 @@ function getInitialDatabase(): DatabaseSchema {
         id: 'usr-student-faith',
         name: 'Faith Wanjiru',
         email: 'faith.wanjiru@example.com',
+        password: 'password123',
         phone: '0712345678',
         role: 'student',
         grade: 'Grade 11',
@@ -522,6 +730,7 @@ function getInitialDatabase(): DatabaseSchema {
         id: 'usr-parent-mary',
         name: 'Mary Wanjiru',
         email: 'mary.wanjiru@example.com',
+        password: 'password123',
         phone: '0722123456',
         role: 'parent',
         relationship: 'Mother',
@@ -611,7 +820,7 @@ function getInitialDatabase(): DatabaseSchema {
         title: 'Grade 11 Chemistry: The Mole Concept & Empirical Formulae',
         subject: 'Chemistry',
         grade: 'Grade 11',
-        tutorName: 'Daniel Owino',
+        tutorName: 'Dr. Dennis Kiprop',
         date: '2026-11-03',
         startTime: '11:00',
         endTime: '12:30',
@@ -637,7 +846,7 @@ function getInitialDatabase(): DatabaseSchema {
         title: 'Grade 11 Computer Studies: Flowcharts & Pseudocode Problem Solving',
         subject: 'Computer Studies',
         grade: 'Grade 11',
-        tutorName: 'Daniel Owino',
+        tutorName: 'Eng. Brian Ochieng',
         date: '2026-11-04',
         startTime: '14:00',
         endTime: '15:30',
@@ -663,7 +872,7 @@ function getInitialDatabase(): DatabaseSchema {
         title: 'Grade 12 English: Set-Book Analytical Essay Structuring',
         subject: 'English',
         grade: 'Grade 12',
-        tutorName: 'Daniel Owino',
+        tutorName: 'Sarah Muthoni',
         date: '2026-11-02',
         startTime: '16:00',
         endTime: '17:30',
@@ -679,7 +888,7 @@ function getInitialDatabase(): DatabaseSchema {
         title: 'Grade 10 Kiswahili: Ngeli za Nomino na Upatano wa Kisarufi',
         subject: 'Kiswahili',
         grade: 'Grade 10',
-        tutorName: 'Daniel Owino',
+        tutorName: 'Mwalimu Amina Juma',
         date: '2026-11-03',
         startTime: '14:00',
         endTime: '15:30',
@@ -687,22 +896,6 @@ function getInitialDatabase(): DatabaseSchema {
         capacity: 25,
         bookedCount: 0,
         meetingLink: 'https://meet.google.com/hth-kisw-g10',
-        status: 'Published',
-        bookings: []
-      },
-      {
-        id: 'les-006',
-        title: 'Grade 9 Mathematics: Linear Equations and Integer Operations',
-        subject: 'Mathematics',
-        grade: 'Grade 9',
-        tutorName: 'Daniel Owino',
-        date: '2026-11-05',
-        startTime: '10:00',
-        endTime: '11:30',
-        durationMinutes: 90,
-        capacity: 25,
-        bookedCount: 0,
-        meetingLink: 'https://meet.google.com/hth-math-g9',
         status: 'Published',
         bookings: []
       }
@@ -1062,9 +1255,9 @@ function getInitialDatabase(): DatabaseSchema {
       },
       {
         id: 'ann-003',
-        title: 'Parent/Guardian Monitoring Portal is Now Open',
-        message: 'Parents and guardians can now link their accounts to monitor their child’s live lesson attendance, verified payment status, assignment feedback, and comprehensive tutor progress reports.',
-        targetAudience: 'Parents',
+        title: 'Join Our Official WhatsApp Coordination Group',
+        message: 'All registered and enrolled learners are invited to join the official WhatsApp discussion group for daily lesson schedule alerts, whiteboard snapshots, and real-time announcements.',
+        targetAudience: 'All',
         publishedAt: '2026-10-21T10:00:00Z',
         isArchived: false
       }
@@ -1075,6 +1268,7 @@ function getInitialDatabase(): DatabaseSchema {
         userId: 'usr-student-faith',
         userName: 'Faith Wanjiru',
         userEmail: 'faith.wanjiru@example.com',
+        userPhone: '0712345678',
         userRole: 'student',
         category: 'Lesson Scheduling',
         subject: 'Request for weekend extra practice session in Chemistry',
@@ -1129,12 +1323,38 @@ export class Database {
       if (fs.existsSync(DB_FILE)) {
         const fileContent = fs.readFileSync(DB_FILE, 'utf-8');
         const parsed = JSON.parse(fileContent);
-        // Ensure defaults if any property is missing
         const defaults = getInitialDatabase();
+        const mergedUsers: UserAccount[] = parsed.users || defaults.users;
+        const demmizAdmin = mergedUsers.find(u => u.email.toLowerCase() === 'demmizkenya@gmail.com');
+        if (!demmizAdmin) {
+          mergedUsers.unshift({
+            id: 'usr-admin-demmiz',
+            name: 'Administrator',
+            email: 'demmizkenya@gmail.com',
+            passwordHash: hashPassword('tuition@hub'),
+            phone: '0708083643',
+            role: 'admin',
+            accountStatus: 'Enrolled',
+            createdAt: '2026-10-22T00:00:00Z'
+          });
+        } else if (!demmizAdmin.passwordHash) {
+          demmizAdmin.passwordHash = hashPassword('tuition@hub');
+        }
+
+        const mergedSettings = {
+          ...defaults.settings,
+          ...(parsed.settings || {}),
+          heroBackgroundImage: parsed.settings?.heroBackgroundImage || defaults.settings.heroBackgroundImage
+        };
+
         return {
           ...defaults,
           ...parsed,
-          settings: { ...defaults.settings, ...(parsed.settings || {}) }
+          settings: mergedSettings,
+          users: mergedUsers,
+          discussions: parsed.discussions || defaults.discussions,
+          gallery: parsed.gallery || defaults.gallery,
+          teachers: parsed.teachers || defaults.teachers
         };
       }
     } catch (err) {

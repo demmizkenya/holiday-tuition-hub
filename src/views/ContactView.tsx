@@ -14,6 +14,8 @@ export const ContactView: React.FC<ContactViewProps> = ({ settings, currentUser 
   const whatsappNumber = settings?.whatsappNumber || '0708083643';
   const tutorEmail = settings?.tutorEmail || 'danielowino233@gmail.com';
 
+  const [senderName, setSenderName] = useState(currentUser?.name || '');
+  const [senderEmail, setSenderEmail] = useState(currentUser?.email || '');
   const [category, setCategory] = useState('General');
   const [subject, setSubject] = useState('');
   const [message, setMessage] = useState('');
@@ -27,11 +29,15 @@ export const ContactView: React.FC<ContactViewProps> = ({ settings, currentUser 
     setLoading(true);
 
     try {
+      const fullMessage = !currentUser && senderEmail
+        ? `[Contact: ${senderName || 'Anonymous'} <${senderEmail}>]\n\n${message.trim()}`
+        : message.trim();
+
       const res = await api.submitInquiry({
         userId: currentUser ? currentUser.id : 'usr-guest',
         category,
         subject: subject.trim(),
-        message: message.trim()
+        message: fullMessage
       });
 
       if (res.success) {
@@ -163,6 +169,37 @@ export const ContactView: React.FC<ContactViewProps> = ({ settings, currentUser 
           )}
 
           <form onSubmit={handleSubmit} className="space-y-4">
+            {!currentUser && (
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pb-1">
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Your Name *
+                  </label>
+                  <input
+                    type="text"
+                    required
+                    value={senderName}
+                    onChange={(e) => setSenderName(e.target.value)}
+                    placeholder="e.g. Mary Achieng"
+                    className="w-full text-xs px-3.5 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-slate-700 mb-1">
+                    Your Email Address *
+                  </label>
+                  <input
+                    type="email"
+                    required
+                    value={senderEmail}
+                    onChange={(e) => setSenderEmail(e.target.value)}
+                    placeholder="e.g. mary@example.com"
+                    className="w-full text-xs px-3.5 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                  />
+                </div>
+              </div>
+            )}
+
             <div>
               <label className="block text-xs font-semibold text-slate-700 mb-1">
                 Inquiry Category *

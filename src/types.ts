@@ -4,6 +4,7 @@ export interface PlatformSettings {
   tutorEmail: string;
   mpesaNumber: string;
   whatsappNumber: string;
+  whatsappGroupUrl: string;
   weeklyPrice: number;
   allowFourWeek: boolean;
   programName: string;
@@ -13,6 +14,7 @@ export interface PlatformSettings {
   timezone: string;
   tutorBio: string;
   aboutText: string;
+  heroBackgroundImage?: string;
 }
 
 export interface GradeItem {
@@ -39,6 +41,8 @@ export interface UserAccount {
   id: string;
   name: string;
   email: string;
+  password?: string;
+  passwordHash?: string;
   phone: string;
   role: 'student' | 'parent' | 'admin' | 'tutor';
   grade?: string;
@@ -89,6 +93,7 @@ export interface Subscription {
   verifiedMpesaRef: string;
   startDate: string;
   expiryDate: string;
+  endDate?: string;
   status: 'Pending Activation' | 'Active' | 'Expired' | 'Cancelled' | 'Suspended';
   verifiedBy: string;
   createdAt: string;
@@ -119,7 +124,7 @@ export interface LessonSlot {
   capacity: number;
   bookedCount: number;
   meetingLink: string;
-  status: 'Published' | 'Draft' | 'Completed' | 'Cancelled' | 'Rescheduled';
+  status: 'Published' | 'Draft' | 'Completed' | 'Cancelled' | 'Rescheduled' | 'Scheduled';
   bookings: LessonBooking[];
 }
 
@@ -144,11 +149,14 @@ export interface LearningResource {
   grade: string;
   subject: string;
   topic: string;
+  type?: string;
   resourceType: 'PDF Notes' | 'Revision Material' | 'Worksheet' | 'Assignment' | 'Practice Paper' | 'Study Guide';
   fileUrl: string;
+  url?: string;
   fileSize: string;
   publicationDate: string;
   isPaidOnly: boolean;
+  isDownloadable?: boolean;
   assignmentDeadline?: string;
 }
 
@@ -267,15 +275,17 @@ export interface Announcement {
 
 export interface SupportInquiry {
   id: string;
-  userId: string;
+  userId?: string;
   userName: string;
   userEmail: string;
-  userRole: string;
+  userPhone?: string;
+  userRole?: string;
   category: 'Payment Verification' | 'Lesson Scheduling' | 'Learning Resources' | 'Account' | 'General';
   subject: string;
   message: string;
   status: 'Open' | 'Under Review' | 'Awaiting User Response' | 'Resolved' | 'Closed';
   adminNotes?: string;
+  tutorResponse?: string;
   responses: {
     author: string;
     message: string;
@@ -290,4 +300,52 @@ export interface AuditLog {
   details: string;
   adminName: string;
   timestamp: string;
+}
+
+export interface DiscussionReply {
+  id: string;
+  authorId: string;
+  authorName: string;
+  authorGrade?: string;
+  content: string;
+  createdAt: string;
+}
+
+export interface DiscussionTopic {
+  id: string;
+  title: string;
+  subject: string;
+  grade: string;
+  authorId: string;
+  authorName: string;
+  authorGrade?: string;
+  content: string;
+  createdAt: string;
+  likes: number;
+  replies: DiscussionReply[];
+}
+
+export interface GalleryPhoto {
+  id: string;
+  title: string;
+  description: string;
+  caption?: string;
+  category: string;
+  imageUrl: string;
+  dateAdded: string;
+  uploadedAt?: string;
+}
+
+export interface TeacherProfile {
+  id: string;
+  name: string;
+  role: string;
+  subjects: string[];
+  qualification: string;
+  qualifications?: string[];
+  experience: string;
+  bio: string;
+  photoUrl: string;
+  imageUrl?: string;
+  email?: string;
 }

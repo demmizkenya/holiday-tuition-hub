@@ -19,63 +19,7 @@ export const ResourcesView: React.FC<ResourcesViewProps> = ({
   const [selectedGrade, setSelectedGrade] = useState<string>('All');
   const [searchTerm, setSearchTerm] = useState('');
 
-  // Default sample resources if none loaded
-  const sampleResources: LearningResource[] = resources.length > 0 ? resources : [
-    {
-      id: 'res-pub-1',
-      title: 'Holiday Tuition Hub Official Program & Syllabus Guide (Public Overview)',
-      description: 'Official overview of learning expectations, weekly timetables, and subject milestones for the November 2026 holiday cohort.',
-      grade: 'All Grades',
-      subject: 'General',
-      topic: 'Program Syllabus',
-      resourceType: 'Study Guide',
-      fileUrl: '#',
-      fileSize: '950 KB',
-      publicationDate: '2026-10-01',
-      isPaidOnly: false
-    },
-    {
-      id: 'res-pub-2',
-      title: 'Grade 11 Calculus Revision Master Booklet & Step-by-Step Solutions',
-      description: 'Complete 24-page PDF covering rate of change, tangents, normals, turning points, and optimization with annotated solutions.',
-      grade: 'Grade 11',
-      subject: 'Mathematics',
-      topic: 'Calculus',
-      resourceType: 'PDF Notes',
-      fileUrl: '#',
-      fileSize: '3.2 MB',
-      publicationDate: '2026-10-15',
-      isPaidOnly: true
-    },
-    {
-      id: 'res-pub-3',
-      title: 'Stoichiometry & The Mole Concept Comprehensive Worksheet',
-      description: '35 structured questions with full working steps for empirical formulae, molarity, percentage composition, and titrations.',
-      grade: 'Grade 11',
-      subject: 'Chemistry',
-      topic: 'The Mole Concept',
-      resourceType: 'Worksheet',
-      fileUrl: '#',
-      fileSize: '2.4 MB',
-      publicationDate: '2026-10-16',
-      isPaidOnly: true
-    },
-    {
-      id: 'res-pub-4',
-      title: 'Computer Studies Paper 1: Flowchart & Algorithm Drill Pack',
-      description: 'Comprehensive collection of exam-tested algorithm problems requiring flowchart construction and pseudocode drafting.',
-      grade: 'Grade 11',
-      subject: 'Computer Studies',
-      topic: 'Algorithms and Data',
-      resourceType: 'Practice Paper',
-      fileUrl: '#',
-      fileSize: '1.8 MB',
-      publicationDate: '2026-10-17',
-      isPaidOnly: true
-    }
-  ];
-
-  const filtered = sampleResources.filter(r => {
+  const filtered = resources.filter(r => {
     const matchSubject = selectedSubject === 'All' || r.subject === selectedSubject;
     const matchGrade = selectedGrade === 'All' || r.grade === selectedGrade || r.grade === 'All Grades';
     const matchSearch = !searchTerm || r.title.toLowerCase().includes(searchTerm.toLowerCase()) || r.topic.toLowerCase().includes(searchTerm.toLowerCase());
@@ -156,8 +100,14 @@ export const ResourcesView: React.FC<ResourcesViewProps> = ({
       </div>
 
       {/* Resource Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filtered.map(resItem => (
+      {filtered.length === 0 ? (
+        <div className="text-center py-16 bg-slate-50 rounded-2xl border border-slate-200">
+          <p className="text-slate-500 text-sm font-medium">No study materials published matching your criteria.</p>
+          <p className="text-slate-400 text-xs mt-1">Check back soon as new materials are added regularly by the administrator.</p>
+        </div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          {filtered.map(resItem => (
           <div
             key={resItem.id}
             className="bg-white rounded-2xl border border-slate-200 p-6 shadow-xs flex flex-col justify-between hover:border-blue-300 transition-all"
@@ -203,7 +153,8 @@ export const ResourcesView: React.FC<ResourcesViewProps> = ({
             </div>
           </div>
         ))}
-      </div>
+        </div>
+      )}
     </div>
   );
 };

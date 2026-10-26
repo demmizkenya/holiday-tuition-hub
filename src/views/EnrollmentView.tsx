@@ -30,6 +30,7 @@ export const EnrollmentView: React.FC<EnrollmentViewProps> = ({
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
   const [registerError, setRegisterError] = useState('');
 
   // Payment form fields
@@ -66,8 +67,13 @@ export const EnrollmentView: React.FC<EnrollmentViewProps> = ({
     e.preventDefault();
     setRegisterError('');
 
-    if (!fullName.trim() || !email.trim() || !phone.trim()) {
-      setRegisterError('Please fill in all required registration details.');
+    if (!fullName.trim() || !email.trim() || !phone.trim() || !password.trim()) {
+      setRegisterError('Please fill in all required registration details including password.');
+      return;
+    }
+
+    if (password.trim().length < 4) {
+      setRegisterError('Password must be at least 4 characters long.');
       return;
     }
 
@@ -76,12 +82,14 @@ export const EnrollmentView: React.FC<EnrollmentViewProps> = ({
         name: fullName.trim(),
         email: email.trim(),
         phone: phone.trim(),
+        password: password.trim(),
         role: 'student',
         grade: selectedGrade,
         selectedSubjects
       });
 
       if (res.success && res.user) {
+        localStorage.setItem('hth_saved_email', email.trim());
         onLoginSuccess(res.user);
         setPayingPhone(res.user.phone);
         setStep(3); // proceed to payment review
@@ -287,6 +295,23 @@ export const EnrollmentView: React.FC<EnrollmentViewProps> = ({
                 placeholder="e.g. 0712345678"
                 className="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
               />
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-slate-700 mb-1">
+                Account Password *
+              </label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="Create a password (min 4 characters)"
+                className="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+              />
+              <p className="text-[11px] text-slate-500 mt-1">
+                Saved permanently so you can sign in anytime with this email and password.
+              </p>
             </div>
 
             <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-600">

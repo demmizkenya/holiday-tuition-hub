@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { UserAccount, SubjectItem } from '../types';
 import { api } from '../services/api';
-import { X, Lock, CheckCircle, AlertCircle, User, ShieldCheck } from 'lucide-react';
+import { X, Lock, CheckCircle, AlertCircle, User, ShieldCheck, Eye, EyeOff } from 'lucide-react';
 
 interface AuthModalProps {
   isOpen: boolean;
@@ -20,7 +20,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
 }) => {
   const [mode, setMode] = useState<'login' | 'register'>(defaultMode);
   const [role, setRole] = useState<'student' | 'parent'>('student');
-  const [email, setEmail] = useState('');
+  const [email, setEmail] = useState(() => localStorage.getItem('hth_saved_email') || '');
+  const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberEmail, setRememberEmail] = useState(true);
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
   const [grade, setGrade] = useState('Grade 11');
@@ -48,13 +51,19 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     setLoading(true);
 
     try {
+      if (rememberEmail) {
+        localStorage.setItem('hth_saved_email', email.trim());
+      } else {
+        localStorage.removeItem('hth_saved_email');
+      }
+
       if (mode === 'login') {
-        const res = await api.login(email);
+        const res = await api.login(email.trim(), password);
         if (res.success && res.user) {
           onLoginSuccess(res.user);
           onClose();
         } else {
-          setErrorMessage(res.message || 'Account not found. Please verify your email or register.');
+          setErrorMessage(res.message || 'Account not found. Please verify your email and password, or enroll first.');
         }
       } else {
         // Register
@@ -64,10 +73,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           return;
         }
 
+        if (password.trim().length < 4) {
+          setErrorMessage('Please enter a password with at least 4 characters.');
+          setLoading(false);
+          return;
+        }
+
         const res = await api.register({
           name: name.trim(),
           email: email.trim(),
           phone: phone.trim(),
+          password: password.trim(),
           role,
           grade: role === 'student' ? grade : undefined,
           selectedSubjects: role === 'student' ? selectedSubjects : undefined,
@@ -314,14 +330,56 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               />
               {mode === 'login' && (
                 <p className="text-[11px] text-slate-500 mt-1">
-                  Tip: Use <strong className="text-slate-700">faith.wanjiru@example.com</strong> (Student), <strong className="text-slate-700">mary.wanjiru@example.com</strong> (Parent), or <strong className="text-slate-700">danielowino233@gmail.com</strong> (Admin).
+                  Enter your registered student or parent email address.
                 </p>
               )}
             </div>
 
+            {/* Password Field */}
+            <div>
+              <div className="flex items-center justify-between mb-1">
+                <label className="block text-xs font-semibold text-slate-700">
+                  Password *
+                </label>
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="text-[11px] text-blue-600 hover:text-blue-800 flex items-center gap-1 font-medium"
+                >
+                  {showPassword ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
+                  <span>{showPassword ? 'Hide' : 'Show'}</span>
+                </button>
+              </div>
+              <div className="relative">
+                <input
+                  type={showPassword ? 'text' : 'password'}
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={mode === 'login' ? 'Enter your account password' : 'Create password (min 4 chars)'}
+                  className="w-full text-sm px-3.5 py-2.5 border border-slate-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600 pr-10"
+                />
+                <Lock className="w-4 h-4 text-slate-400 absolute right-3.5 top-3 pointer-events-none" />
+              </div>
+            </div>
+
+            {/* Remember Email Checkbox */}
+            <div className="flex items-center gap-2 pt-1">
+              <input
+                type="checkbox"
+                id="rememberEmail"
+                checked={rememberEmail}
+                onChange={(e) => setRememberEmail(e.target.checked)}
+                className="w-4 h-4 text-blue-600 rounded border-slate-300 focus:ring-blue-500"
+              />
+              <label htmlFor="rememberEmail" className="text-xs text-slate-600 cursor-pointer select-none">
+                Remember my email for ease of future sign-ins
+              </label>
+            </div>
+
             {mode === 'register' && (
               <div className="text-[11px] text-slate-500 leading-relaxed bg-slate-50 p-3 rounded-lg border border-slate-200">
-                By registering, you agree to Holiday Tuition Hub's academic conduct policy and privacy guidelines. M-Pesa tuition fee payments (KSh 699/week) are verified manually by Daniel Owino before active lesson access is unlocked.
+                Your credentials and profile are saved permanently in the Admin Portal for Daniel Owino to review and verify payments. To unlock live classes and notes, send KSh 699/week to M-Pesa <strong>0116654805</strong>.
               </div>
             )}
 

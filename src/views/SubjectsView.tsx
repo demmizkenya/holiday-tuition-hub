@@ -29,27 +29,34 @@ export const SubjectsView: React.FC<SubjectsViewProps> = ({ subjects, settings, 
       </div>
 
       {/* Subject Navigation Tabs */}
-      <div className="flex flex-wrap items-center justify-center gap-2 p-1.5 bg-slate-100 rounded-2xl max-w-4xl mx-auto border border-slate-200">
-        {subjects.map(subj => {
-          const isActive = subj.id === activeSubjectId;
-          return (
-            <button
-              key={subj.id}
-              onClick={() => setActiveSubjectId(subj.id)}
-              className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
-                isActive
-                  ? 'bg-blue-700 text-white shadow-sm'
-                  : 'text-slate-700 hover:text-slate-900 hover:bg-white/60'
-              }`}
-            >
-              {subj.name}
-            </button>
-          );
-        })}
-      </div>
+      {subjects.length === 0 ? (
+        <div className="text-center py-16 bg-slate-50 rounded-2xl border border-slate-200 max-w-4xl mx-auto">
+          <p className="text-slate-500 text-sm font-medium">No subjects published yet.</p>
+          <p className="text-slate-400 text-xs mt-1">Please check back soon or contact administration on WhatsApp.</p>
+        </div>
+      ) : (
+        <>
+          <div className="flex flex-wrap items-center justify-center gap-2 p-1.5 bg-slate-100 rounded-2xl max-w-4xl mx-auto border border-slate-200">
+            {subjects.map(subj => {
+              const isActive = subj.id === activeSubjectId;
+              return (
+                <button
+                  key={subj.id}
+                  onClick={() => setActiveSubjectId(subj.id)}
+                  className={`px-5 py-2.5 rounded-xl text-xs font-bold transition-all ${
+                    isActive
+                      ? 'bg-blue-700 text-white shadow-sm'
+                      : 'text-slate-700 hover:text-slate-900 hover:bg-white/60'
+                  }`}
+                >
+                  {subj.name}
+                </button>
+              );
+            })}
+          </div>
 
-      {/* Selected Subject Detailed View */}
-      {currentSubject && (
+          {/* Selected Subject Detailed View */}
+          {currentSubject && (
         <div className="bg-white rounded-3xl border border-slate-200 p-8 sm:p-10 shadow-xs max-w-5xl mx-auto space-y-8">
           {/* Title & Badge */}
           <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 border-b border-slate-100 pb-6">
@@ -174,6 +181,8 @@ export const SubjectsView: React.FC<SubjectsViewProps> = ({ subjects, settings, 
             </button>
           </div>
         </div>
+      )}
+      </>
       )}
     </div>
   );
